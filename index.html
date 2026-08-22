@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One Click Passport Photo Maker</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- jsPDF Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Background Removal Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/imgly-background-removal.js"></script>
+</head>
+<body class="bg-gray-100 p-4">
+
+  <div class="max-w-xl mx-auto bg-white p-5 rounded-xl shadow-md">
+    <h1 class="text-xl font-bold text-center text-blue-600 mb-4">Passport Size Photo Generator</h1>
+
+    <!-- Upload Section -->
+    <div class="mb-3">
+      <label class="block font-semibold mb-1 text-sm">1. Photo Upload Karein:</label>
+      <input type="file" id="imageInput" accept="image/*" class="w-full border p-2 rounded text-sm">
+    </div>
+
+    <!-- Options Section -->
+    <div class="grid grid-cols-2 gap-3 mb-3">
+      <div>
+        <label class="block font-semibold mb-1 text-sm">2. Kitni Photos?</label>
+        <select id="photoCount" class="w-full border p-2 rounded text-sm">
+          <option value="6">6 Photos</option>
+          <option value="12">12 Photos</option>
+          <option value="18">18 Photos</option>
+          <option value="24">24 Photos</option>
+          <option value="30">30 Photos</option>
+          <option value="36">36 Photos</option>
+          <option value="42">42 Photos</option>
+          <option value="48">48 Photos</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-1 text-sm">3. Background Color:</label>
+        <input type="color" id="bgColor" value="#ffffff" class="w-full h-10 border rounded cursor-pointer p-1">
+      </div>
+    </div>
+
+    <button id="processBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 text-sm">
+      Generate A4 Sheet
+    </button>
+
+    <!-- Status Text -->
+    <p id="status" class="text-center font-medium mt-3 text-sm text-gray-700"></p>
+
+    <!-- Hidden Canvas -->
+    <canvas id="a4Canvas" class="hidden"></canvas>
+
+    <!-- Download Buttons -->
+    <div id="downloadSection" class="hidden mt-4 flex gap-3">
+      <button id="downloadJpg" class="w-1/2 bg-green-600 text-white py-2 rounded font-bold hover:bg-green-700 text-sm">
+        Download JPG
+      </button>
+      <button id="downloadPdf" class="w-1/2 bg-red-600 text-white py-2 rounded font-bold hover:bg-red-700 text-sm">
+        Download PDF
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const processBtn = document.getElementById('processBtn');
+    const photoCountSelect = document.getElementById('photoCount');
+    const bgColorInput = document.getElementById('bgColor');
+    const status = document.getElementById('status');
+    const canvas = document.getElementById('a4Canvas');
+    const ctx = canvas.getContext('2d');
+    const downloadSection = document.getElementById('downloadSection');
+
+    // A4 Sheet dimensions at 300 DPI
+    canvas.width = 2480;
+    canvas.height = 3508;
+
+    processBtn.addEventListener('click', async () => {
+      if (!imageInput.files[0]) {
+        alert("Kripya photo select karein!");
+        return;
+      }
+
+      status.innerText = "Processing... Pehli baar thoda time lag sakta hai, please wait...";
+      processBtn.disabled = true;
+
+      try {
+        const file = imageInput.files[0];
+        
+        // Background Removal with mobile config
+        const blob = await imglyRemoveBackground(file, {
+          publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/"
+        });
+        
+        const img = new Image();
+        img.src = URL.createObjectURL(blob);
+
+        img.onload = () => {
+          const processedCanvas = document.createElement('canvas');
+          const pCtx = processedCanvas.getContext('2d');
+          
+          // Passport standard size (35mm x 45mm approx at 300 DPI -> 413 x 531 px)
+          const pWidth = 413;
+          const pHeight = 531;
+          processedCanvas.width = pWidth;
+          processedCanvas.height = pHeight;
+
+          // Beauty & Brightness Enhancement
+          pCtx.filter = "brightness(108%) contrast(105%) saturate(105%)";
+          
+          // Background Color Fill
+          pCtx.fillStyle = bgColorInput.value;
+          pCtx.fillRect(0, 0, pWidth, pHeight);
+
+          // Draw Cutout Image
+          pCtx.drawImage(img, 0, 0, pWidth, pHeight);
+
+          // Border around photo
+          pCtx.strokeStyle = "#dddddd";
+          pCtx.lineWidth = 4;
+          pCtx.strokeRect(0, 0, pWidth, pHeight);
+
+          // A4 Canvas Fill White
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          const totalPhotos = parseInt(photoCountSelect.value);
+          const cols = 6; 
+          const marginX = 120;
+          const marginY = 150;
+          const gapX = 40;
+          const gapY = 50;
+
+          for (let i = 0; i < totalPhotos; i++) {
+            const row = Math.floor(i / cols);
+            const col = i % cols;
+
+            const x = marginX + col * (pWidth + gapX);
+            const y = marginY + row * (pHeight + gapY);
+
+            ctx.drawImage(processedCanvas, x, y);
+          }
+
+          status.innerText = "Ready! Aap download kar sakte hain.";
+          downloadSection.classList.remove('hidden');
+          processBtn.disabled = false;
+        };
+
+      } catch (error) {
+        console.error(error);
+        status.innerText = "Error: Background remove nahi ho paya. Dobara koshish karein.";
+        processBtn.disabled = false;
+      }
+    });
+
+    // Download JPG
+    document.getElementById('downloadJpg').addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'passport_photos_a4.jpg';
+      link.href = canvas.toDataURL('image/jpeg', 0.95);
+      link.click();
+    });
+
+    // Download PDF
+    document.getElementById('downloadPdf').addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+      pdf.save('passport_photos_a4.pdf');
+    });
+  </script>
+</body>
+</html>

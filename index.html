@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Shiv Online AI - Photo Studio & CSC Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root { --primary:#6366f1; --primary-dark:#4f46e5; --secondary:#ec4899; --accent:#06b6d4; --dark:#1e1b4b; --light:#f8fafc; --success:#22c55e; --warning:#f59e0b; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;color:var(--dark);overflow-x:hidden}
+.navbar{background:rgba(255,255,255,0.98);padding:12px 16px;position:fixed;width:100%;top:0;z-index:1000;box-shadow:0 2px 15px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:8px;font-size:1.3rem;font-weight:700;color:var(--primary)}
+.logo i{font-size:1.6rem;background:linear-gradient(45deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.mobile-menu-btn{background:none;border:none;font-size:1.5rem;color:var(--primary);cursor:pointer;padding:4px}
+.nav-links{display:none;position:absolute;top:60px;left:0;width:100%;background:white;flex-direction:column;padding:16px;box-shadow:0 10px 20px rgba(0,0,0,0.1);gap:12px;z-index:999}
+.nav-links.show{display:flex}
+.nav-links a{text-decoration:none;color:var(--dark);font-weight:500;padding:10px;border-radius:8px;transition:all 0.3s;display:flex;align-items:center;gap:8px}
+.nav-links a:hover,.nav-links a.active{background:#eef2ff;color:var(--primary)}
+.user-profile{display:none;align-items:center;gap:8px;background:var(--light);padding:6px 12px;border-radius:50px;cursor:pointer}
+.user-profile img{width:28px;height:28px;border-radius:50%}
+.btn-gmail{background:white;color:#ea4335;border:2px solid #ea4335;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:0.9rem}
+.btn-gmail:hover{background:#ea4335;color:white}
+.main-container{margin-top:70px;padding:16px;max-width:1200px;margin-left:auto;margin-right:auto}
+.page-section{display:none;animation:fadeIn 0.4s ease}
+.page-section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero{text-align:center;padding:2rem 1rem;color:white}
+.hero h1{font-size:1.7rem;margin-bottom:0.8rem;text-shadow:1px 1px 3px rgba(0,0,0,0.2);line-height:1.3}
+.hero p{font-size:0.95rem;opacity:0.95;max-width:500px;margin:0 auto 1.5rem;line-height:1.5}
+.cards-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin-bottom:2rem}
+@media(min-width:768px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
+.card{background:white;border-radius:16px;padding:1.5rem;box-shadow:0 8px 30px rgba(0,0,0,0.12);transition:transform 0.3s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-3px)}
+.card::before{content:'';position:absolute;top:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,var(--primary),var(--secondary))}
+.card-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:white;margin-bottom:0.8rem}
+.card h3{font-size:1.1rem;margin-bottom:0.4rem}
+.card p{color:#64748b;font-size:0.88rem;margin-bottom:1.2rem;line-height:1.4}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:10px;border:none;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.3s;text-decoration:none}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;box-shadow:0 4px 12px rgba(99,102,241,0.35);width:100%}
+.btn-primary:hover{transform:scale(1.02);box-shadow:0 6px 18px rgba(99,102,241,0.5)}
+.btn-success{background:linear-gradient(135deg,var(--success),#16a34a);color:white}
+.btn-warning{background:linear-gradient(135deg,var(--warning),#d97706);color:white}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
+.btn-sm{padding:6px 12px;font-size:0.8rem}
+.upload-area{border:3px dashed #cbd5e1;border-radius:16px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all 0.3s;background:#f8fafc;margin-bottom:1rem}
+.upload-area:active{border-color:var(--primary);background:#eef2ff}
+.upload-area i{font-size:2.5rem;color:var(--primary);margin-bottom:0.8rem}
+.upload-area h3{color:var(--dark);margin-bottom:0.3rem;font-size:1.1rem}
+.upload-area p{color:#64748b;font-size:0.85rem}
+#fileInput{display:none}
+.editor-layout{display:flex;flex-direction:column;gap:1rem}
+@media(min-width:768px){.editor-layout{flex-direction:row}}
+.canvas-container{background:#f1f5f9;border-radius:16px;padding:1rem;display:flex;justify-content:center;align-items:center;min-height:300px;flex:1;position:relative}
+#mainCanvas{max-width:100%;max-height:400px;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.1);cursor:crosshair}
+.tools-panel{display:flex;flex-direction:column;gap:0.8rem;min-width:280px}
+.tool-group{background:white;border-radius:12px;padding:1rem;border:1px solid #e2e8f0}
+.tool-group h4{font-size:0.85rem;color:#64748b;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px}
+.tool-btn{width:100%;padding:10px;margin-bottom:6px;border:1px solid #e2e8f0;border-radius:8px;background:white;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.3s;font-size:0.9rem}
+.tool-btn:hover{background:#eef2ff;border-color:var(--primary);color:var(--primary)}
+.tool-btn.active{background:var(--primary);color:white;border-color:var(--primary)}
+.bg-colors{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bg-color-option{width:100%;aspect-ratio:1;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:transform 0.2s;position:relative}
+.bg-color-option.selected{border-color:var(--primary);box-shadow:0 0 0 2px white,0 0 0 4px var(--primary)}
+.bg-color-option.transparent{background:repeating-conic-gradient(#ccc 0% 25%,white 0% 50%) 50% / 10px 10px}
+.slider-group{margin-bottom:10px}
+.slider-group label{display:flex;justify-content:space-between;font-size:0.85rem;color:#64748b;margin-bottom:4px}
+.slider-group input[type="range"]{width:100%;height:6px;border-radius:3px;background:#e2e8f0;outline:none;-webkit-appearance:none}
+.slider-group input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--primary);cursor:pointer}
+.count-selector{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.count-btn{padding:10px;border:2px solid #e2e8f0;border-radius:8px;background:white;cursor:pointer;font-weight:600;transition:all 0.3s;font-size:0.9rem}
+.count-btn.active{border-color:var(--primary);background:#eef2ff;color:var(--primary)}
+.a4-sheet{width:210mm;height:297mm;background:white;margin:0 auto 1rem;box-shadow:0 0 15px rgba(0,0,0,0.15);position:relative;overflow:hidden;border:1px solid #ddd}
+.photos-grid{display:grid;gap:2mm;padding:8mm;justify-content:center}
+.photo-slot{width:35mm;height:45mm;background:#f1f5f9;border:0.5px solid #cbd5e1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.photo-slot img{width:100%;height:100%;object-fit:cover}
+@media(max-width:768px){.a4-sheet{transform:scale(0.42);transform-origin:top center;margin-bottom:-160mm}}
+@media print{body *{visibility:hidden}.a4-sheet,.a4-sheet *{visibility:visible}.a4-sheet{position:absolute;left:0;top:0;width:210mm;height:297mm;box-shadow:none;border:none;margin:0;transform:none!important}}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.8rem;margin-bottom:1.5rem}
+@media(min-width:768px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
+.stat-card{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;padding:1.2rem;border-radius:14px;text-align:center}
+.stat-card h3{font-size:1.8rem;margin-bottom:0.3rem}
+.stat-card p{opacity:0.9;font-size:0.8rem}
+.visitors-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+.visitors-table th,.visitors-table td{padding:10px 8px;text-align:left;border-bottom:1px solid #e2e8f0}
+.visitors-table th{background:#f8fafc;font-weight:600;color:#64748b}
+.table-wrap{overflow-x:auto;background:white;border-radius:12px;padding:0.5rem}
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2000;justify-content:center;align-items:center;padding:16px}
+.modal-overlay.active{display:flex}
+.modal{background:white;border-radius:20px;padding:2rem 1.5rem;width:100%;max-width:380px;text-align:center;animation:slideUp 0.3s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.loading-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.97);z-index:3000;justify-content:center;align-items:center;flex-direction:column;gap:1rem}
+.loading-overlay.active{display:flex}
+.spinner{width:50px;height:50px;border:4px solid #e2e8f0;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.steps-indicator{display:flex;justify-content:center;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:6px;padding:6px 12px;background:white;border-radius:50px;font-size:0.8rem;font-weight:500;color:#64748b;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+.step.active{background:var(--primary);color:white}
+.step.completed{background:var(--success);color:white}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--dark);color:white;padding:12px 20px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.2);z-index:4000;transition:transform 0.3s ease;font-size:0.9rem;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--success)}
+.toast.error{background:#ef4444}
+.toast.info{background:var(--primary)}
+.section-title{font-size:1.25rem;margin-bottom:1rem;color:var(--dark);display:flex;align-items:center;gap:8px}
+.back-btn{background:#f1f5f9;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;margin-bottom:0.8rem;display:inline-flex;align-items:center;gap:6px;font-size:0.9rem;font-weight:500}
+.size-info{background:#eef2ff;padding:10px 14px;border-radius:8px;font-size:0.8rem;color:var(--primary);margin-bottom:1rem;border-left:4px solid var(--primary);line-height:1.4}
+.footer{text-align:center;padding:2rem 1rem;color:white;opacity:0.9;font-size:0.85rem}
+.white-box{background:white;border-radius:16px;padding:1.5rem;box-shadow:0 8px 30px rgba(0,0,0,0.1);margin-bottom:1rem}
+.notice-box{background:#fef3c7;border-radius:12px;padding:1rem;border-left:4px solid var(--warning);font-size:0.85rem;color:#92400e;line-height:1.5}
+.two-btn{display:flex;gap:8px}
+.two-btn .btn{flex:1}
+.reset-btn{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
+.reset-btn:hover{background:#fecaca}
+.compare-btn{background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe}
+.compare-btn:hover{background:#bfdbfe}
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+<div class="logo"><i class="fas fa-camera-retro"></i><span>Shiv Online AI</span></div>
+<button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fas fa-bars" id="menuIcon"></i></button>
+<div class="nav-links" id="navLinks">
+<a href="#" class="active" onclick="goHome();return false;"><i class="fas fa-home"></i> होम</a>
+<a href="#" onclick="startPassport();return false;"><i class="fas fa-id-card"></i> पासपोर्ट फोटो</a>
+<a href="#" onclick="openAdmin();return false;"><i class="fas fa-user-shield"></i> एडमिन पैनल</a>
+<div class="user-profile" id="userProfile" onclick="logout()"><img src="" id="userImage" alt="User"><span id="userName">Guest</span></div>
+<button class="btn-gmail" id="loginBtn" onclick="openLogin()"><i class="fab fa-google"></i> Gmail से लॉगिन</button>
+</div>
+</nav>
+
+<div class="main-container">
+
+<!-- HOME -->
+<div id="homePage" class="page-section active">
+<div class="hero">
+<h1>🎉 Shiv Online AI में आपका स्वागत है!</h1>
+<p>आपका अपना AI Photo Studio & CSC Center। पासपोर्ट साइज फोटो, बैकग्राउंड रिमूवल, फोटो एन्हांसमेंट - सब कुछ एक क्लिक में, बिल्कुल फ्री!</p>
+</div>
+<div class="cards-grid">
+<div class="card">
+<div class="card-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><i class="fas fa-id-card"></i></div>
+<h3>पासपोर्ट साइज फोटो</h3>
+<p>किसी भी फोटो को पासपोर्ट साइज में बनाएं। A4 शीट पर 6 से 48 फोटो प्रिंट करें।</p>
+<button class="btn btn-primary" onclick="startPassport()"><i class="fas fa-magic"></i> शुरू करें</button>
+</div>
+<div class="card">
+<div class="card-icon" style="background:linear-gradient(135deg,#ec4899,#f43f5e)"><i class="fas fa-eraser"></i></div>
+<h3>बैकग्राउंड रिमूवल</h3>
+<p>फोटो का बैकग्राउंड हटाएं। Magic Wand से क्लिक करें और बैकग्राउंड गायब!</p>
+<button class="btn btn-primary" onclick="startBgRemove()"><i class="fas fa-cut"></i> ट्राई करें</button>
+</div>
+<div class="card">
+<div class="card-icon" style="background:linear-gradient(135deg,#06b6d4,#3b82f6)"><i class="fas fa-wand-magic-sparkles"></i></div>
+<h3>फोटो एन्हांस & ब्यूटी</h3>
+<p>फोटो की क्वालिटी बढ़ाएं, चेहरे को सुंदर बनाएं, ब्राइटनेस ठीक करें।</p>
+<button class="btn btn-primary" onclick="startEnhance()"><i class="fas fa-star"></i> एन्हांस करें</button>
+</div>
+</div>
+</div>
+
+<!-- UPLOAD -->
+<div id="uploadPage" class="page-section">
+<div class="white-box">
+<button class="back-btn" onclick="goHome()"><i class="fas fa-arrow-left"></i> वापस</button>
+<h2 class="section-title"><i class="fas fa-cloud-upload-alt"></i> फोटो अपलोड करें</h2>
+<div class="steps-indicator">
+<div class="step active" id="step1"><i class="fas fa-upload"></i> अपलोड</div>
+<div class="step" id="step2"><i class="fas fa-edit"></i> एडिट</div>
+<div class="step" id="step3"><i class="fas fa-download"></i> डाउनलोड</div>
+</div>
+<div class="upload-area" onclick="document.getElementById('fileInput').click()">
+<i class="fas fa-cloud-upload-alt"></i>
+<h3>फोटो यहाँ टैप करें या ड्रैग करें</h3>
+<p>JPEG, PNG, WEBP - अधिकतम 10MB</p>
+</div>
+<input type="file" id="fileInput" accept="image/*" onchange="handleFile(event)">
+</div>
+</div>
+
+<!-- EDITOR -->
+<div id="editorPage" class="page-section">
+<div class="white-box">
+<button class="back-btn" onclick="showPage('uploadPage')"><i class="fas fa-arrow-left"></i> वापस</button>
+<h2 class="section-title"><i class="fas fa-sliders-h"></i> फोटो एडिटर</h2>
+<div class="size-info" id="sizeInfo" style="display:none;"><i class="fas fa-info-circle"></i> पासपोर्ट साइज: 35mm x 45mm | A4 शीट पर प्रिंट करें</div>
+<div class="editor-layout">
+<div class="canvas-container"><canvas id="mainCanvas"></canvas></div>
+<div class="tools-panel">
+
+<div class="tool-group">
+<h4><i class="fas fa-crop"></i> ऑटो क्रॉप (पासपोर्ट)</h4>
+<button class="tool-btn" onclick="autoCropPassport()"><i class="fas fa-crop-simple"></i> ऑटो क्रॉप - पासपोर्ट साइज</button>
+<button class="tool-btn" onclick="autoCropSquare()"><i class="fas fa-square"></i> ऑटो क्रॉप - स्क्वायर</button>
+<div class="two-btn">
+<button class="btn btn-sm reset-btn" onclick="resetImage()"><i class="fas fa-undo"></i> रीसेट</button>
+<button class="btn btn-sm compare-btn" onmousedown="showOriginal()" onmouseup="showEdited()" ontouchstart="showOriginal()" ontouchend="showEdited()"><i class="fas fa-eye"></i> ओरिजिनल देखें</button>
+</div>
+</div>
+
+<div class="tool-group">
+<h4><i class="fas fa-palette"></i> बैकग्राउंड कलर</h4>
+<div class="bg-colors">
+<div class="bg-color-option selected" style="background:#fff;" onclick="setBg(this,'#ffffff')"></div>
+<div class="bg-color-option transparent" onclick="setBg(this,'transparent')"></div>
+<div class="bg-color-option" style="background:#1e3a8a;" onclick="setBg(this,'#1e3a8a')"></div>
+<div class="bg-color-option" style="background:#dc2626;" onclick="setBg(this,'#dc2626')"></div>
+<div class="bg-color-option" style="background:#fbbf24;" onclick="setBg(this,'#fbbf24')"></div>
+<div class="bg-color-option" style="background:#16a34a;" onclick="setBg(this,'#16a34a')"></div>
+<div class="bg-color-option" style="background:#9333ea;" onclick="setBg(this,'#9333ea')"></div>
+<div class="bg-color-option" style="background:#000;" onclick="setBg(this,'#000000')"></div>
+</div>
+<div class="slider-group" style="margin-top:10px;">
+<label>Magic Wand टॉलरेंस <span id="tolVal">30</span></label>
+<input type="range" id="tolerance" min="5" max="100" value="30" oninput="document.getElementById('tolVal').textContent=this.value">
+</div>
+<button class="tool-btn" onclick="magicWandMode()" id="wandBtn"><i class="fas fa-wand-magic"></i> Magic Wand ON - फोटो पर क्लिक करें</button>
+<button class="tool-btn" onclick="removeWhiteBg()"><i class="fas fa-eraser"></i> सफेद/हल्का बैकग्राउंड हटाएं</button>
+</div>
+
+<div class="tool-group">
+<h4><i class="fas fa-sun"></i> फोटो एन्हांस (स्लाइडर)</h4>
+<div class="slider-group"><label>ब्राइटनेस <span id="briVal">0</span></label><input type="range" id="brightness" min="-50" max="50" value="0" oninput="applyFilters()"></div>
+<div class="slider-group"><label>कंट्रास्ट <span id="conVal">0</span></label><input type="range" id="contrast" min="-50" max="50" value="0" oninput="applyFilters()"></div>
+<div class="slider-group"><label>सैचुरेशन <span id="satVal">0</span></label><input type="range" id="saturation" min="-50" max="50" value="0" oninput="applyFilters()"></div>
+<div class="slider-group"><label>शार्पनेस <span id="sharpVal">0</span></label><input type="range" id="sharpness" min="0" max="100" value="0" oninput="applyFilters()"></div>
+<button class="tool-btn" onclick="autoEnhance()"><i class="fas fa-wand-magic"></i> ऑटो एन्हांस (बेस्ट सेटिंग)</button>
+</div>
+
+<div class="tool-group">
+<h4><i class="fas fa-face-smile"></i> ब्यूटी फिक्स</h4>
+<div class="slider-group"><label>स्किन स्मूथिंग <span id="smoothVal">0</span></label><input type="range" id="smoothing" min="0" max="20" value="0" oninput="applyBeauty()"></div>
+<button class="tool-btn" onclick="beautyOneClick()"><i class="fas fa-magic"></i> वन-क्लिक ब्यूटी</button>
+<button class="tool-btn" onclick="whitenTeeth()"><i class="fas fa-tooth"></i> दांत सफेद करें</button>
+<button class="tool-btn" onclick="brightenEyes()"><i class="fas fa-eye"></i> आंखें चमकाएं</button>
+</div>
+
+<div class="tool-group" id="countGroup" style="display:none;">
+<h4><i class="fas fa-images"></i> कितनी फोटो चाहिए?</h4>
+<div class="count-selector">
+<button class="count-btn active" onclick="setCount(this,6)">6</button>
+<button class="count-btn" onclick="setCount(this,12)">12</button>
+<button class="count-btn" onclick="setCount(this,18)">18</button>
+<button class="count-btn" onclick="setCount(this,24)">24</button>
+<button class="count-btn" onclick="setCount(this,30)">30</button>
+<button class="count-btn" onclick="setCount(this,36)">36</button>
+<button class="count-btn" onclick="setCount(this,42)">42</button>
+<button class="count-btn" onclick="setCount(this,48)">48</button>
+</div>
+</div>
+
+<div class="tool-group">
+<h4><i class="fas fa-download"></i> एक्शन</h4>
+<button class="btn btn-success" style="width:100%;margin-bottom:8px;" onclick="previewA4()"><i class="fas fa-eye"></i> A4 प्रीव्यू देखें</button>
+<button class="btn btn-primary" style="width:100%;" onclick="downloadHD()"><i class="fas fa-download"></i> HD फोटो डाउनलोड (300 DPI)</button>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<!-- A4 PREVIEW -->
+<div id="a4Page" class="page-section">
+<div class="white-box" style="text-align:center;">
+<button class="back-btn" onclick="showPage('editorPage')" style="margin-right:auto;display:flex;"><i class="fas fa-arrow-left"></i> एडिटर पर वापस<
